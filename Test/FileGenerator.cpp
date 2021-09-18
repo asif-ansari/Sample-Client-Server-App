@@ -5,8 +5,13 @@
 
 int main(int argc, char* argv[])
 {
+    if (argc != 2)
+    {
+        std::cerr << "Usage: FileGenerator <number_of_ticker_to_generate>\n";
+        exit(1);
+    }
     std::string filename_txt("md_in.txt");
-    int nTests = 1000;
+    int nTests = atoi(argv[1]);
     
     std::random_device seed;
     std::mt19937 mte(seed());  // mersenne_twister_engine
