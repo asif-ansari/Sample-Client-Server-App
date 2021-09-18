@@ -63,13 +63,29 @@ void Server::accept()
 void Server::sendToAll(message m)
 {
     std::cout<<clients.size()<<" Client(s) Connected\n";
-    for(auto& client : clients)
+    std::vector<Socket>::iterator it = clients.begin();
+
+    while(it != clients.end())
     {
-        std::cout<<"Sending message "<<m.to_string()<<" to sockID -> "<<client.getSockID()<<"\n";
-        bool success = client.SendMessage(m.to_string());
-        if(!success)
+        if(!(it->is_connected()))
         {
-            std::cout<<"failed\n";
+            std::cout<<"Client disconnected!!!!\n";
+            it = clients.erase(it);
+        }
+        else
+        {
+            std::cout<<"Sending message "<<m.to_string()<<" to sockID -> "<<it->getSockID()<<"\n";
+            bool success = it->SendMessage(m.to_string());
+            if(!success)
+            {
+                std::cout<<"failed\n";
+            }
+            ++it;
         }
     }
+
+    // for(auto& client : clients)
+    // {
+        
+    // }
 }

@@ -15,9 +15,9 @@ message str_to_message(const std::string &s)
     return m;
 }
 
-void MessageReader::run_forever(bool running, std::shared_ptr<SafeQueue<message> > sq)
+void MessageReader::run_forever(std::shared_ptr<bool> running, std::shared_ptr<SafeQueue<message> > sq)
 {
-    while (running)
+    while (*running)
     {
         std::string str;
         while(std::getline(std::cin, str))
@@ -33,7 +33,7 @@ void MessageReader::run_forever(bool running, std::shared_ptr<SafeQueue<message>
 
 void MessageReader::run()
 {
-    running = true;
+    *running = true;
     reader = std::make_unique<std::thread>(&(this->run_forever), running, sq);
 }
 
@@ -44,13 +44,13 @@ message MessageReader::getMessage()
 
 MessageReader::MessageReader()
 {
-    running = false;
+    running = std::make_shared<bool>(false);
     sq = std::make_shared<SafeQueue<message> >();
 }
 
 MessageReader::~MessageReader()
 {
     std::cout<<"Message reader destroyed\n";
-    running = false;
+    *running = false;
     reader->join();
 }

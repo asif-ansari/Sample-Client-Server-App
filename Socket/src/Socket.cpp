@@ -6,8 +6,7 @@
 #include <unistd.h>
 #include <cstring>
 
-Socket::Socket(int socketId)
-    : socketId(socketId)
+Socket::Socket(int socketId): socketId(socketId)
 {
     if (socketId == -1)
     {
@@ -44,24 +43,31 @@ bool Socket::SendMessage(std::string const& buffer)
     while(sentSize != size)
     {
         std::cout<<"socket send start "<<sentSize<<" "<<size<<" "<<buffer<<"\n";
-        std::size_t sent = ::write(socketId, buffer.data() + sentSize, size - sentSize);
-        if (sent == -1u && errno == EINTR)
+        if(is_connected())
         {
-            std::cout<<"socket send failed ignorging\n";
-            continue;
+            std::size_t sent = ::write(socketId, buffer.data() + sentSize, size - sentSize);
+            std::cout<<"wrote to sock\n";
+            if (sent == -1u && errno == EINTR)
+            {
+                std::cout<<"socket send failed ignorging\n";
+                continue;
+            }
+            if (sent == -1u)
+            {
+                std::cout<<"socket send failed\n";
+                return false;
+            }
+            if (sent == 0)
+            {
+                std::cout<<"socket send nothing sent\n";
+                return false;
+            }
+            sentSize += sent;
         }
-        if (sent == -1u)
+        else
         {
-            std::cout<<"socket send failed\n";
             return false;
         }
-        if (sent == 0)
-        {
-            std::cout<<"socket send nothing sent\n";
-            return false;
-        }
-        sentSize += sent;
-        // std::cout<<"socket send end "<<sentSize<<" "<<size<<" "<<buffer<<"\n";
     }
     std::cout<<"socket send done\n";
     return true;
@@ -74,19 +80,15 @@ bool Socket::RecvMessage(std::string& buffer)
     char tmp[1024];
     std::size_t get;
     get= ::read(socketId, tmp, sizeof(tmp));
-    // while((get= ::read(socketId, tmp, sizeof(tmp))))
-    // {
-        // std::cout<<"started recieving "<<get<<"\n";
-        // if (get == -1u && errno == EINTR)
-        // {
-        //     continue;
-        // }
-        // if (get == -1u)
-        // {
-        //     return false;
-        // }
-        buffer.append(tmp, get);
-    // }
-    // std::cout<<"recieved\n";
+    buffer.append(tmp, get);
     return true;
+}
+
+bool Socket::is_connected()
+{
+    int error_code;
+    unsigned int error_code_size = sizeof(error_code);
+    getsockopt(socketId, SOL_SOCKET, SO_ERROR, &error_code, &error_code_size);
+    std::cout<<error_code<<" <- Error\n";
+    return (error_code == 0);
 }

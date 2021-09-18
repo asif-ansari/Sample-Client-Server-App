@@ -19,5 +19,6 @@ class Socket
         virtual bool SendMessage(std::string const& buffer);
         virtual bool RecvMessage(std::string& buffer);
         int getSockID() { return socketId; }
+        bool is_connected();
 };
 

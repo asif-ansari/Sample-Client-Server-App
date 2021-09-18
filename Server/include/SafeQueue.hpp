@@ -31,6 +31,10 @@ public:
     q.pop();
     return val;
   }
+  bool empty()
+  {
+    return q.empty();
+  }
 
 private:
   std::queue<T> q;
