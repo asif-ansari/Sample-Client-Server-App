@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
             bool success = client.RecvMessage(buf);
             std::cout<<"New Message -> "<<buf<<'\n';
             sq->enqueue(buf);
-            std::cout<<"Inserted\n";
+            // std::cout<<"Inserted\n";
             if(!success)
             {
                 std::stringstream message("Failed: sendMessage()\n");

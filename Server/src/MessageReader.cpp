@@ -29,6 +29,8 @@ void MessageReader::run_forever(std::shared_ptr<bool> running, std::shared_ptr<S
             message m = str_to_message(str);
             sq->enqueue(m);
         }
+        message m(0,0,0,true); //special EOD message
+        sq->enqueue(m);
     }
     std::cout<<"reader shut down\n";
 }

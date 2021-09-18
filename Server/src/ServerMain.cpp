@@ -4,18 +4,25 @@
 #include <sstream>
 #include <cstdint>
 
+bool eod = false;
+
 void message_sender(Server *server)
 {
     MessageReader m;
     m.run();
-    while (true)
+    while(true)
     {
         message msg = m.getMessage();
-        server->sendToAll(msg);
+        if(msg.eod)
+        {
+            eod = msg.eod;
+            break;
+        }
+        else
+            server->sendToAll(msg);
     }
     std::cout<<"messge sender shutdown\n";
 }
-
 
 int main(int argc, char* argv[])
 {
@@ -31,8 +38,9 @@ int main(int argc, char* argv[])
     {
         Server  server(argv[1], atoi(argv[2]));
         std::thread t(message_sender, &server);
-        while(true)
+        while(!eod)
         {
+            std::cout<<"eod = "<<eod<<"\n";
             server.accept();
         }
         std::cout<<"Shutting down\n";
