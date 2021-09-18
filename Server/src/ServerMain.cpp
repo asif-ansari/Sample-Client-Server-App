@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
         std::thread t(message_sender, &server);
         while(!eod)
         {
-            std::cout<<"eod = "<<eod<<"\n";
+            // std::cout<<"eod = "<<eod<<"\n";
             server.accept();
         }
         std::cout<<"Shutting down\n";

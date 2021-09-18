@@ -7,6 +7,7 @@
 #include <sstream>
 #include <unistd.h>
 #include <cstring>
+#include <poll.h>
 
 Server::Server(std::string const& hostname, int const port): Socket(::socket(PF_INET, SOCK_STREAM, 0))
 {
@@ -35,14 +36,22 @@ void Server::accept()
 {
     struct sockaddr_storage serverStorage;
     socklen_t addr_size = sizeof serverStorage;
+    
 
-    int newSocket = ::accept(socketId, (struct sockaddr*)&serverStorage, &addr_size);
-    if (newSocket == -1)
+    pollfd pfd = {socketId, POLLIN, 0};
+    int ret = ::poll(&pfd, 1, 300);
+    if (ret == -1)
+        std::cerr << "Poll Error";
+    else if(pfd.revents & POLLIN)
     {
-        std::cerr << fprintf(stdout, "%s\n%s\n", "Failed to accept", strerror(errno));
-    }    
-    std::cout<<"Adding new client\n";
-    clients.push_back(Socket(newSocket));
+        int newSocket = ::accept(socketId, (struct sockaddr*)&serverStorage, &addr_size);
+        if (newSocket == -1)
+        {
+            std::cerr << fprintf(stdout, "%s\n%s\n", "Failed to accept", strerror(errno));
+        }    
+        std::cout<<"Adding new client\n";
+        clients.push_back(Socket(newSocket));
+    }
 }
 
 void Server::sendToAll(message m)
