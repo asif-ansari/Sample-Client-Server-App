@@ -1,5 +1,6 @@
 add_executable(Server
-    include/Server.h
+    include/MessageReader.h
+    include/SafeQueue.hpp
     src/ServerMain.cpp
     src/MessageReader.cpp
 )

@@ -9,8 +9,7 @@
 #include <cstring>
 
 
-Client::Client(std::string const& hostname, int const port)
-    : Socket(::socket(PF_INET, SOCK_STREAM, 0))
+Client::Client(std::string const& hostname, int const port): Socket(::socket(PF_INET, SOCK_STREAM, 0))
 {
     struct sockaddr_in serverAddr;
     socklen_t addrSize = sizeof(serverAddr);

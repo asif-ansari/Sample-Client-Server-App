@@ -29,33 +29,18 @@ Server::Server(std::string const& hostname, int const port): Socket(::socket(PF_
         message << strerror(errno);
         throw std::runtime_error(message.str());
     }
-    // struct timeval timeout;      
-    // timeout.tv_sec = 1;
-    // timeout.tv_usec = 0;
-
-    // if (setsockopt (socketId, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof timeout) < 0)
-    //     throw std::runtime_error("setsockopt failed RCV");
-
-    // if (setsockopt (socketId, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof timeout) < 0)
-    //     throw std::runtime_error("setsockopt failed SND");
 }
 
 void Server::accept()
 {
-    struct  sockaddr_storage    serverStorage;
-    socklen_t                   addr_size   = sizeof serverStorage;
-    // struct timeval timeout;      
-    // timeout.tv_sec = 1;
-    // timeout.tv_usec = 0;
+    struct sockaddr_storage serverStorage;
+    socklen_t addr_size = sizeof serverStorage;
 
     int newSocket = ::accept(socketId, (struct sockaddr*)&serverStorage, &addr_size);
     if (newSocket == -1)
     {
         std::cerr << fprintf(stdout, "%s\n%s\n", "Failed to accept", strerror(errno));
-    }
-    // if (setsockopt (socketId, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof timeout) < 0)
-    //     throw std::runtime_error("setsockopt failed SND");
-    
+    }    
     std::cout<<"Adding new client\n";
     clients.push_back(Socket(newSocket));
 }
@@ -83,9 +68,4 @@ void Server::sendToAll(message m)
             ++it;
         }
     }
-
-    // for(auto& client : clients)
-    // {
-        
-    // }
 }
