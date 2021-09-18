@@ -17,6 +17,8 @@ message str_to_message(const std::string &s)
 
 void MessageReader::run_forever(std::shared_ptr<bool> running, std::shared_ptr<SafeQueue<message> > sq)
 {
+    // Wait 10 seconds before publishing anything
+    std::this_thread::sleep_for(std::chrono::milliseconds(10000));
     while (*running)
     {
         std::string str;
@@ -40,6 +42,11 @@ void MessageReader::run()
 message MessageReader::getMessage()
 {
     return sq->dequeue();
+}
+
+bool MessageReader::q_empty()
+{
+    return sq->empty();
 }
 
 MessageReader::MessageReader()

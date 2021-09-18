@@ -13,6 +13,7 @@ private:
 public:
     void run();
     message getMessage();
+    bool q_empty();
     MessageReader();
     ~MessageReader();
 };
