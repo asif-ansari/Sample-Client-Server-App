@@ -16,6 +16,8 @@ class Server: public Socket
         Server(std::string const & hostname, int const port);
         void accept();
         void sendToAll(message m);
+        void sendToClient(int fc, std::string msg);
         void checkStatusAndDiconnect();
+        void updateHBTracker(int fd, std::chrono::steady_clock::time_point new_time);
         std::vector<Socket>& getClients();
 };

@@ -12,7 +12,7 @@ Socket::Socket(int socketId): socketId(socketId)
     {
         std::stringstream message("Failed: socket()\n");
         message << strerror(errno);
-        throw std::runtime_error(message.str());
+        exit(-1);
     }
 }
 
@@ -74,7 +74,7 @@ bool Socket::RecvMessage(std::string& buffer)
 {
     buffer.clear();
 
-    char tmp[1024];
+    char tmp[1024] = {0};
     std::size_t get;
     get= ::read(socketId, tmp, sizeof(tmp));
     buffer.append(tmp, get);

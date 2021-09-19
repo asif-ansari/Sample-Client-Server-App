@@ -21,14 +21,14 @@ Server::Server(std::string const& hostname, int const port): Socket(::socket(PF_
     {
         std::stringstream message("Failed: bind()\n");
         message << strerror(errno);
-        throw std::runtime_error(message.str());
+        exit(-1);
     }
 
     if(::listen(socketId, max_queued_requests) != 0)
     {
         std::stringstream message("Failed: listen()\n");
         message << strerror(errno);
-        throw std::runtime_error(message.str());
+        exit(-1);
     }
 }
 
@@ -84,6 +84,12 @@ void Server::sendToAll(message m)
     }
 }
 
+void Server::sendToClient(int fd, std::string msg)
+{
+    std::cout<<"Send msg to client "<<fd<<" "<<msg<<"\n";
+    clients[fd].SendMessage(msg);
+}
+
 std::vector<Socket>& Server::getClients()
 {
     return clients;
@@ -135,4 +141,12 @@ void Server::removeFromHBTracker(int sockId)
     {
         std::cout<<"NOT Removed from hb tracker "<<sockId<<"\n";
     }
+}
+
+void Server::updateHBTracker(int fd, std::chrono::steady_clock::time_point new_time)
+{
+    if(heartbeat_tracker.find(fd) != heartbeat_tracker.end())
+        heartbeat_tracker[fd] = new_time;
+    else
+        std::cout<<"sockfd not found in hb tracker "<<fd<<'\n';
 }

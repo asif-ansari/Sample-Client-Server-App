@@ -32,6 +32,18 @@ void dump_msg_thread(std::shared_ptr<SafeQueue<std::string> > sq, std::shared_pt
     fout_txt.close();
 }
 
+void heartbeat_handler(Client *c)
+{
+    while (true)
+    {
+        auto now = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - c->getLastActive()).count();
+        if(elapsed > 10)
+        {
+            c->SendMessage("AreYouThere?");
+        }
+    }
+}
 
 int main(int argc, char* argv[])
 {
@@ -40,33 +52,30 @@ int main(int argc, char* argv[])
         std::cerr << "Usage: client <host> <port>\n";
         exit(1);
     }
+    Client  client(argv[1], atoi(argv[2]));
     std::shared_ptr<SafeQueue<std::string> > sq = std::make_shared<SafeQueue<std::string> >();
     std::shared_ptr<bool> running = std::make_shared<bool>(true);
     std::thread dumper(dump_msg_thread, sq, running);
+    std::thread hbThread(heartbeat_handler, &client);
 
-    try
+    while (true)
     {
-        Client  client(argv[1], atoi(argv[2]));
-
-        while (true)
+        std::string buf;
+        bool success = client.RecvMessage(buf);
+        std::cout<<"New Message -> "<<buf<<'\n';
+        if(buf == "Yes")
         {
-            std::string buf;
-            bool success = client.RecvMessage(buf);
-            std::cout<<"New Message -> "<<buf<<'\n';
-            sq->enqueue(buf);
-            if(!success)
-            {
-                std::stringstream message("Failed: sendMessage()\n");
-                message << strerror(errno);
-                *running = false;
-                throw std::runtime_error(message.str());
-            }
+            client.setLastActive(std::chrono::steady_clock::now());
+            continue;
         }
-        std::cout<<"Exiting\n";
-    }
-    catch(std::exception const& e)
-    {
-        std::cerr << "Exception: " << e.what() << "\n";
+        sq->enqueue(buf);
+        if(!success)
+        {
+            std::stringstream message("Failed: sendMessage()\n");
+            message << strerror(errno);
+            *running = false;
+            exit(-1);
+        }
     }
     *running = false;
     std::cout<<"Shutdown "<<*running<<"\n";

@@ -3,6 +3,8 @@
 #include <iostream>
 #include <chrono>
 #include <map>
+#include <iostream>
+#include <poll.h>
 
 bool eod = false;
 
@@ -22,6 +24,41 @@ void message_sender(Server *server)
             server->sendToAll(msg);
     }
     std::cout<<"messge sender shutdown\n";
+}
+
+void heartbeat_handler(Server *server)
+{
+    while (!eod)
+    {
+        for(auto &client : server->getClients())
+        {
+            pollfd pfd = {client.getSockID(), POLLIN, 0};
+            int ret = ::poll(&pfd, 1, 300);
+            if (ret == -1)
+                std::cerr << "Poll Error";
+            else if(pfd.revents & POLLIN)
+            {
+                std::string buf;
+                bool res = client.RecvMessage(buf);
+                if (res)
+                {
+                    if(buf == "AreYouThere?")
+                    {
+                        client.SendMessage("Yes");
+                        server->updateHBTracker(client.getSockID(), std::chrono::steady_clock::now());
+                    }
+                    else
+                    {
+                        // Ignore other messages
+                    }
+                }
+                else
+                {
+                    std::cout<<"Errrrrrrrr\n";
+                }
+            }
+        }
+    }
 }
 
 void heartbeat(Server *server)
@@ -48,16 +85,18 @@ int main(int argc, char* argv[])
         Server  server(argv[1], atoi(argv[2]));
         std::thread ms_thread(message_sender, &server);
         std::thread hb_thread(heartbeat, &server);
+        std::thread hbH_thread(heartbeat_handler, &server);
         while(!eod)
         {
             server.accept();
         }
         ms_thread.join();
         hb_thread.join();
+        hbH_thread.join();
     }
     catch(std::exception const& e)
     {
         std::cerr << "Exception: " << e.what() << "\n";
-        throw;
+        exit(-1);
     }
 }

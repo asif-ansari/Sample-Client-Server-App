@@ -16,7 +16,12 @@ Client::Client(std::string const& hostname, int const port): Socket(::socket(PF_
     {
         std::stringstream message("Failed: connect()\n");
         message << strerror(errno);
-        throw std::runtime_error(message.str());
+        exit(-1);
+    }
+    else
+    {
+        //Connected successfully
+        last_active = std::chrono::steady_clock::now();
     }
 }
 
@@ -29,9 +34,11 @@ bool Client::SendMessage(std::string const& buffer)
         {
             std::stringstream message("Failed: shutdown()\n");
             message << strerror(errno);
-            throw std::runtime_error(message.str());
+            exit(-1);
         }
     }
+    // Message sent successfully
+    last_active = std::chrono::steady_clock::now();
     return result;
 }
 
@@ -44,8 +51,20 @@ bool Client::RecvMessage(std::string & buffer)
         {
             std::stringstream message("Failed: shutdown()\n");
             message << strerror(errno);
-            throw std::runtime_error(message.str());
+            exit(-1);
         }
     }
+    // Message recived
+    last_active = std::chrono::steady_clock::now();
     return result;
+}
+
+std::chrono::steady_clock::time_point& Client::getLastActive()
+{
+    return last_active;
+}
+
+void Client::setLastActive(std::chrono::steady_clock::time_point new_time)
+{
+    last_active = new_time;
 }
