@@ -77,7 +77,10 @@ bool Socket::RecvMessage(std::string& buffer)
     char tmp[1024] = {0};
     std::size_t get;
     get= ::read(socketId, tmp, sizeof(tmp));
-    buffer.append(tmp, get);
+    if(get < 1024)
+        buffer.append(tmp, get);
+    else
+        return false;
     return true;
 }
 
