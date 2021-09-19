@@ -1,8 +1,6 @@
 #include "../../Socket/include/Server.h"
 #include "../include/MessageReader.h"
 #include <iostream>
-#include <sstream>
-#include <cstdint>
 
 bool eod = false;
 
@@ -40,17 +38,13 @@ int main(int argc, char* argv[])
         std::thread t(message_sender, &server);
         while(!eod)
         {
-            // std::cout<<"eod = "<<eod<<"\n";
             server.accept();
         }
-        std::cout<<"Shutting down\n";
         t.join();
-        std::cout<<"Shutting down 2\n";
     }
     catch(std::exception const& e)
     {
         std::cerr << "Exception: " << e.what() << "\n";
         throw;
     }
-    std::cout<<"Shutting down end\n";
 }

@@ -1,7 +1,4 @@
 #include <iostream>
-#include <cstring>
-#include <array>
-#include <vector>
 
 int main()
 {

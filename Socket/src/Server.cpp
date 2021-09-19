@@ -42,6 +42,7 @@ void Server::accept()
     int ret = ::poll(&pfd, 1, 300);
     if (ret == -1)
         std::cerr << "Poll Error";
+    
     else if(pfd.revents & POLLIN)
     {
         int newSocket = ::accept(socketId, (struct sockaddr*)&serverStorage, &addr_size);

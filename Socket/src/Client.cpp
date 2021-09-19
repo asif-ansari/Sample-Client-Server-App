@@ -1,11 +1,5 @@
 #include "../include/Client.h"
-#include <string>
-#include <cstdint>
-#include <arpa/inet.h>
-#include <strings.h>
-#include <iostream>
 #include <sstream>
-#include <unistd.h>
 #include <cstring>
 
 

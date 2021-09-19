@@ -3,8 +3,6 @@
 
 #include <iostream>
 #include <sstream>
-#include <cstdint>
-#include <chrono>
 #include <thread>
 #include <cstring>
 #include <fstream>
@@ -13,25 +11,23 @@
 
 void dump_msg_thread(std::shared_ptr<SafeQueue<std::string> > sq, std::shared_ptr<bool> running)
 {
+    // Append pid if multiple clients are running in the same directory
+    // NOT GUARANTEED to be unique
     pid_t pid = getpid();
     std::stringstream file_name;
     file_name<<"md_out_"<<pid<<".txt";
+    
     std::string filename_txt(file_name.str());
     std::ofstream fout_txt(filename_txt, std::ios::binary);
-
-    // std::cout<<"trying to remove\n";
     while(*running)
     {
         if(sq->empty())
         {
-            // std::cout<<"q empty | running = "<<*running<<"\n";
-            // std::this_thread::sleep_for(std::chrono::milliseconds(300));
             continue;
         }
         std::string tmp = sq->dequeue();
         tmp.pop_back();
         fout_txt<<tmp<<"\n";
-        // std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
     fout_txt.close();
 }
@@ -58,7 +54,6 @@ int main(int argc, char* argv[])
             bool success = client.RecvMessage(buf);
             std::cout<<"New Message -> "<<buf<<'\n';
             sq->enqueue(buf);
-            // std::cout<<"Inserted\n";
             if(!success)
             {
                 std::stringstream message("Failed: sendMessage()\n");
@@ -66,7 +61,6 @@ int main(int argc, char* argv[])
                 *running = false;
                 throw std::runtime_error(message.str());
             }
-            // std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
         std::cout<<"Exiting\n";
     }

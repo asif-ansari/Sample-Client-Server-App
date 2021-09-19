@@ -1,6 +1,5 @@
 #include "../include/MessageReader.h"
 #include <iostream>
-#include <sstream>
 
 message str_to_message(const std::string &s)
 {
