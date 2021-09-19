@@ -33,8 +33,9 @@
 ## Dependencies and Versions
 
 1. CMake - 3.7 (Tested on 3.21.2)
-2. C++ - minimum 14 (Tested on gcc 11.1.0)
-3. ldd (GNU libc) 2.33
+2. C++ - 14
+3. gcc - 5 (Tested on gcc 11.1.0)
+4. ldd (GNU libc) 2.33
 
 ## Build Instructions
 
@@ -73,8 +74,9 @@ cd (project_root)/build/Test
 1. Heartbeat functionality
 2. Use lockless ring buffer instead of Queue
 
-## References
+## References/Credits
 
 1. For skeleton Client/Sever code -> https://codereview.stackexchange.com/questions/125273/c-version-of-a-client-server-application - 
 2. Thread Safe Queue - https://stackoverflow.com/questions/15278343/c11-thread-safe-queue
 3. Helps looking at compiler output -> https://cppinsights.io/
+4. Heartbeat server idea -> https://gist.github.com/arrieta/df4e6e354cc9f133df9f0433f9de3e14

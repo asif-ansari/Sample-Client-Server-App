@@ -52,6 +52,10 @@ void Server::accept()
         }    
         std::cout<<"Adding new client\n";
         clients.push_back(Socket(newSocket));
+
+        // Timestamp for every new client
+        auto pair = std::make_pair(newSocket, std::chrono::steady_clock::now());
+        heartbeat_tracker.insert(pair);
     }
 }
 
@@ -77,5 +81,43 @@ void Server::sendToAll(message m)
             }
             ++it;
         }
+    }
+}
+
+std::vector<Socket>& Server::getClients()
+{
+    return clients;
+}
+
+void Server::checkStatusAndDiconnect()
+{
+    std::vector<Socket>::iterator it = clients.begin();
+
+    while(it != clients.end())
+    {
+        auto sockId = it->getSockID();
+        auto last_active = heartbeat_tracker[sockId];
+        auto now = std::chrono::steady_clock::now();
+
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_active).count();
+        std::cout<<"No Message from "<<sockId<<" since "<<elapsed<<"ms\n";
+        if(elapsed > 6000)  // This should come from a configuration file.
+        {
+            // Disconnect Client
+            int error = ::close(socketId);
+            std::cout<<"closing coonection "<<sockId<<"\n";
+            if(error != 0)
+            {
+                std::cout<<"Error while disconneting client | error_no = "<<error<<'\n';
+            }
+            else
+            {
+                // Remove Client from monitor lists
+                std::cout<<"Client disconnected!!!!\n";
+                it = clients.erase(it);
+                heartbeat_tracker.erase(heartbeat_tracker.find(socketId));
+            }
+        }
+        ++it;
     }
 }

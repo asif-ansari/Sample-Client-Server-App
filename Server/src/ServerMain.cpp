@@ -1,6 +1,8 @@
 #include "../../Socket/include/Server.h"
 #include "../include/MessageReader.h"
 #include <iostream>
+#include <chrono>
+#include <map>
 
 bool eod = false;
 
@@ -22,6 +24,15 @@ void message_sender(Server *server)
     std::cout<<"messge sender shutdown\n";
 }
 
+void heartbeat(Server *server)
+{
+    while (!eod)
+    {
+        server->checkStatusAndDiconnect();
+        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+    }
+}
+
 int main(int argc, char* argv[])
 {
     if (argc != 3)
@@ -35,12 +46,14 @@ int main(int argc, char* argv[])
     try
     {
         Server  server(argv[1], atoi(argv[2]));
-        std::thread t(message_sender, &server);
+        std::thread ms_thread(message_sender, &server);
+        std::thread hb_thread(heartbeat, &server);
         while(!eod)
         {
             server.accept();
         }
-        t.join();
+        ms_thread.join();
+        hb_thread.join();
     }
     catch(std::exception const& e)
     {
