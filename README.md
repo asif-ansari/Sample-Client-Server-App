@@ -70,9 +70,10 @@ cd (project_root)/build/Test
 3. Sending to all connected clients
 4. Handle Client disconnect
 5. Heartbeat functionality
+6. Uses lockfree queue
 
 ## TODO
-1. Use lockless ring buffer instead of Queue
+-
 
 ## References/Credits
 
