@@ -69,10 +69,10 @@ cd (project_root)/build/Test
 2. Reading from stdin
 3. Sending to all connected clients
 4. Handle Client disconnect
+5. Heartbeat functionality
 
 ## TODO
-1. Heartbeat functionality
-2. Use lockless ring buffer instead of Queue
+1. Use lockless ring buffer instead of Queue
 
 ## References/Credits
 
