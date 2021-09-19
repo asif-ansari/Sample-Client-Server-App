@@ -96,6 +96,11 @@ std::vector<Socket>& Server::getClients()
     return clients;
 }
 
+int Server::getClientCount()
+{
+    return clients.size();
+}
+
 void Server::checkStatusAndDiconnect()
 {
     std::vector<Socket>::iterator it = clients.begin();

@@ -32,6 +32,13 @@ void message_sender(Server *server)
 
 void heartbeat_handler(Server *server)
 {
+    while (server->getClientCount() < 1)
+    {
+        std::cout<<"No Clients yet\n"; // Wait for at least 1 client to connect
+        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+        continue;
+    }
+    
     while (!eod)
     {
         for(auto &client : server->getClients())

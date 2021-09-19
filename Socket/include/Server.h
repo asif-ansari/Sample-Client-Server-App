@@ -21,5 +21,6 @@ class Server: public Socket
         void sendToClient(int fc, std::string msg);
         void checkStatusAndDiconnect();
         void updateHBTracker(int fd, std::chrono::steady_clock::time_point new_time);
+        int getClientCount();
         std::vector<Socket>& getClients();
 };

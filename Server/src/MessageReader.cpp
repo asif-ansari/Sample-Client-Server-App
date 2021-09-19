@@ -25,7 +25,7 @@ void MessageReader::run_forever(std::shared_ptr<bool> running, std::shared_ptr<m
         while(std::getline(std::cin, str))
         {
             std::cout<<"New Event on exchange -> "<<str<<'\n';
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            // std::this_thread::sleep_for(std::chrono::milliseconds(10));
             message m = str_to_message(str);
             sq->enqueue(m);
         }
