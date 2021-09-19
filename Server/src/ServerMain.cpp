@@ -36,6 +36,11 @@ void heartbeat_handler(Server *server)
     {
         for(auto &client : server->getClients())
         {
+            if(&client == nullptr)
+            {
+                std::cout<<"client is null\n";
+                continue;
+            }
             pollfd pfd = {client.getSockID(), POLLIN, 0};
             int ret = ::poll(&pfd, 1, 300);
             if (ret == -1)
@@ -58,7 +63,8 @@ void heartbeat_handler(Server *server)
                 }
                 else
                 {
-                    std::cout<<"Errrrrrrrr\n";
+                    std::cout<<"Unable to read message from client \n";
+                    // abort();
                 }
             }
         }

@@ -1,6 +1,7 @@
 #include "../include/Client.h"
 #include <sstream>
 #include <cstring>
+#include <iostream>
 
 
 Client::Client(std::string const& hostname, int const port): Socket(::socket(PF_INET, SOCK_STREAM, 0))
@@ -15,12 +16,14 @@ Client::Client(std::string const& hostname, int const port): Socket(::socket(PF_
     if (::connect(socketId, (struct sockaddr*)&serverAddr, addrSize) != 0)
     {
         std::stringstream message("Failed: connect()\n");
-        message << strerror(errno);
+        message << strerror(errno)<<"\n";
+        std::cout<<message.str();
         exit(-1);
     }
     else
     {
         //Connected successfully
+        std::cout<<"Connected sockId="<<socketId<<"\n";
         last_active = std::chrono::steady_clock::now();
     }
 }
@@ -33,7 +36,8 @@ bool Client::SendMessage(std::string const& buffer)
         if (::shutdown(socketId, SHUT_WR) != 0)
         {
             std::stringstream message("Failed: shutdown()\n");
-            message << strerror(errno);
+            message << strerror(errno)<<"\n";
+            std::cout<<message.str();
             exit(-1);
         }
     }
@@ -50,8 +54,9 @@ bool Client::RecvMessage(std::string & buffer)
         if (::shutdown(socketId, SHUT_WR) != 0)
         {
             std::stringstream message("Failed: shutdown()\n");
-            message << strerror(errno);
-            exit(-1);
+            message << strerror(errno)<<"\n";
+            std::cout<<message.str();
+            // abort();
         }
     }
     // Message recived

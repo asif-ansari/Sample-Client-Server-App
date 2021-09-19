@@ -6,13 +6,17 @@
 #include <unistd.h>
 #include <cstring>
 
-Socket::Socket(int socketId): socketId(socketId)
+Socket::Socket(int socketId)
 {
     if (socketId == -1)
     {
         std::stringstream message("Failed: socket()\n");
         message << strerror(errno);
         exit(-1);
+    }
+    else
+    {
+        this->socketId =socketId;
     }
 }
 

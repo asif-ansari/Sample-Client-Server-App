@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <chrono>
+#include <mutex>
 
 class Server: public Socket
 {
@@ -12,6 +13,7 @@ class Server: public Socket
         std::map<int, std::chrono::steady_clock::time_point> heartbeat_tracker;
         void addToHBTracker(int newSocket);
         void removeFromHBTracker(int sockId);
+        std::mutex mutex_lock;
     public:
         Server(std::string const & hostname, int const port);
         void accept();

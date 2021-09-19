@@ -70,13 +70,20 @@ int main(int argc, char* argv[])
             client.setLastActive(std::chrono::steady_clock::now());
             continue;
         }
-        sq->enqueue(buf);
         if(!success)
         {
             std::stringstream message("Failed: sendMessage()\n");
-            message << strerror(errno);
+            message << strerror(errno)<<"\n";
             *running = false;
-            exit(-1);
+            std::cout<<message.str();
+            // abort();
+            continue;
+        }
+        bool queued = sq->enqueue(buf);
+        if(!queued)
+        {
+            std::cout<<"Queue failed\n";
+            abort();
         }
     }
     *running = false;

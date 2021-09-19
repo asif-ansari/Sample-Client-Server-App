@@ -12,6 +12,7 @@ project(PsyQuant VERSION 0.1
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O0 -g")
 
 add_subdirectory(Socket)
 add_subdirectory(Server)

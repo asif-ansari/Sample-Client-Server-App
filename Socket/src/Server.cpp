@@ -49,6 +49,7 @@ void Server::accept()
             std::cerr << fprintf(stdout, "%s\n%s\n", "Failed to accept", strerror(errno));
         }    
         std::cout<<"Adding new client on socket "<<newSocket<<"\n";
+        std::lock_guard<std::mutex> lock(mutex_lock);
         clients.push_back(Socket(newSocket));
         addToHBTracker(newSocket);
     }
@@ -65,6 +66,7 @@ void Server::sendToAll(message m)
         {
             std::cout<<"Client "<<it->getSockID()<<" disconnected!!!!\n";
             removeFromHBTracker(it->getSockID());
+            std::lock_guard<std::mutex> lock(mutex_lock);
             it = clients.erase(it);
         }
         else
@@ -73,7 +75,8 @@ void Server::sendToAll(message m)
             bool success = it->SendMessage(m.to_string());
             if(!success)
             {
-                std::cout<<"failed\n";
+                std::cout<<"sending to client socket failed\n";
+                // abort();
             }
             // Message Successfully sent, update last_active
             heartbeat_tracker[it->getSockID()] = std::chrono::steady_clock::now();
@@ -113,6 +116,7 @@ void Server::checkStatusAndDiconnect()
             // Remove Client from monitor lists
             std::cout<<"Client "<<it->getSockID()<<" disconnected!!!!\n";
             removeFromHBTracker(it->getSockID());
+            std::lock_guard<std::mutex> lock(mutex_lock);
             it = clients.erase(it);
         }
         else

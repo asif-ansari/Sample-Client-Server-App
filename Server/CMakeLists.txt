@@ -1,6 +1,6 @@
 add_executable(Server
     include/MessageReader.h
-    include/SafeQueue.hpp
+    include/locklessQ.hpp
     src/ServerMain.cpp
     src/MessageReader.cpp
 )
