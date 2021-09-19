@@ -27,7 +27,6 @@
  ┗ Test
    ┣ FileGenerator.cpp
    ┗ FIleReader.cpp
-
 ```
 
 ## Dependencies and Versions
