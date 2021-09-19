@@ -19,15 +19,13 @@ Server::Server(std::string const& hostname, int const port): Socket(::socket(PF_
 
     if (::bind(socketId, (struct sockaddr *) &serverAddr, sizeof(serverAddr)) != 0)
     {
-        std::stringstream message("Failed: bind()\n");
-        message << strerror(errno);
+        std::cout<<"Failed: bind()"<<strerror(errno)<<"\n";
         exit(-1);
     }
 
     if(::listen(socketId, max_queued_requests) != 0)
     {
-        std::stringstream message("Failed: listen()\n");
-        message << strerror(errno);
+        std::cout<<"Failed: listen()"<<strerror(errno)<<"\n";
         exit(-1);
     }
 }
@@ -106,7 +104,7 @@ void Server::checkStatusAndDiconnect()
 
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_active).count();
         std::cout<<"No Message from "<<it->getSockID()<<" since "<<elapsed<<"ms\n";
-        if(elapsed > 3000)  // This should come from a configuration file.
+        if(elapsed > 60000)  // 1minute. This should come from a configuration file.
         {
             // Disconnect Client
             int error = ::close(it->getSockID());

@@ -37,8 +37,8 @@ void heartbeat_handler(Client *c)
     while (true)
     {
         auto now = std::chrono::steady_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - c->getLastActive()).count();
-        if(elapsed > 10)
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - c->getLastActive()).count();
+        if(elapsed > 30000) // Haven't heard anything from server in past 30 seconds
         {
             c->SendMessage("AreYouThere?");
         }
