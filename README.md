@@ -80,3 +80,4 @@ cd (project_root)/build/Test
 2. Thread Safe Queue - https://stackoverflow.com/questions/15278343/c11-thread-safe-queue
 3. Helps looking at compiler output -> https://cppinsights.io/
 4. Heartbeat server idea -> https://gist.github.com/arrieta/df4e6e354cc9f133df9f0433f9de3e14
+5. Lockfree queue -> https://github.com/cameron314/readerwriterqueue

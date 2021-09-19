@@ -8,6 +8,7 @@ struct message
     int quantity;
     bool eod;
 
+    message(): ticker(0),price(0), quantity(0), eod(false) { }
     message(int t, int p, int q): ticker(t), price(p), quantity(q), eod(false) { }
     message(int t, int p, int q, bool e): ticker(t), price(p), quantity(q), eod(e) { }
     

@@ -1,5 +1,5 @@
 #include "../Socket/include/Client.h"
-#include "../Server/include/SafeQueue.hpp"
+#include "../Server/include/locklessQ.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 
-void dump_msg_thread(std::shared_ptr<SafeQueue<std::string> > sq, std::shared_ptr<bool> running)
+void dump_msg_thread(std::shared_ptr<moodycamel::ReaderWriterQueue<std::string> > sq, std::shared_ptr<bool> running)
 {
     // Append pid if multiple clients are running in the same directory
     // NOT GUARANTEED to be unique
@@ -21,13 +21,13 @@ void dump_msg_thread(std::shared_ptr<SafeQueue<std::string> > sq, std::shared_pt
     std::ofstream fout_txt(filename_txt, std::ios::binary);
     while(*running)
     {
-        if(sq->empty())
+        std::string tmp;
+        bool success = sq->try_dequeue(tmp);
+        if(success)
         {
-            continue;
+            tmp.pop_back();
+            fout_txt<<tmp<<"\n";
         }
-        std::string tmp = sq->dequeue();
-        tmp.pop_back();
-        fout_txt<<tmp<<"\n";
     }
     fout_txt.close();
 }
@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
         exit(1);
     }
     Client  client(argv[1], atoi(argv[2]));
-    std::shared_ptr<SafeQueue<std::string> > sq = std::make_shared<SafeQueue<std::string> >();
+    auto sq = std::make_shared<moodycamel::ReaderWriterQueue<std::string> >();
     std::shared_ptr<bool> running = std::make_shared<bool>(true);
     std::thread dumper(dump_msg_thread, sq, running);
     std::thread hbThread(heartbeat_handler, &client);

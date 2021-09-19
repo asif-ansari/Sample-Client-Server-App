@@ -1,5 +1,6 @@
 #include "../include/MessageReader.h"
 #include <iostream>
+#include <vector>
 
 message str_to_message(const std::string &s)
 {
@@ -14,7 +15,7 @@ message str_to_message(const std::string &s)
     return m;
 }
 
-void MessageReader::run_forever(std::shared_ptr<bool> running, std::shared_ptr<SafeQueue<message> > sq)
+void MessageReader::run_forever(std::shared_ptr<bool> running, std::shared_ptr<moodycamel::ReaderWriterQueue<message> > sq)
 {
     // Wait 10 seconds before publishing anything
     std::this_thread::sleep_for(std::chrono::milliseconds(10000));
@@ -40,20 +41,23 @@ void MessageReader::run()
     reader = std::make_unique<std::thread>(&(this->run_forever), running, sq);
 }
 
-message MessageReader::getMessage()
+bool MessageReader::getMessage(message &m)
 {
-    return sq->dequeue();
+    bool success = sq->try_dequeue(m);
+    if(success)
+        return true;
+    return false;
 }
 
-bool MessageReader::q_empty()
-{
-    return sq->empty();
-}
+// bool MessageReader::q_empty()
+// {
+//     return sq->empty();
+// }
 
 MessageReader::MessageReader()
 {
     running = std::make_shared<bool>(false);
-    sq = std::make_shared<SafeQueue<message> >();
+    sq = std::make_shared<moodycamel::ReaderWriterQueue<message> >();
 }
 
 MessageReader::~MessageReader()

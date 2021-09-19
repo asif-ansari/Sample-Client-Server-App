@@ -14,14 +14,18 @@ void message_sender(Server *server)
     m.run();
     while(true)
     {
-        message msg = m.getMessage();
-        if(msg.eod)
+        message msg;
+        bool success = m.getMessage(msg);
+        if(success)
         {
-            eod = msg.eod;
-            break;
+            if(msg.eod)
+            {
+                eod = msg.eod;
+                break;
+            }
+            else
+                server->sendToAll(msg);
         }
-        else
-            server->sendToAll(msg);
     }
     std::cout<<"messge sender shutdown\n";
 }
