@@ -28,7 +28,9 @@ void dump_msg_thread(std::shared_ptr<moodycamel::ReaderWriterQueue<std::string> 
             tmp.pop_back();
             fout_txt<<tmp<<"\n";
         }
+        fout_txt.flush();
     }
+    std::cout<<"dumping to file\n";
     fout_txt.close();
 }
 
