@@ -80,6 +80,8 @@ void Server::sendToAll(message m)
                 std::cout<<"failed\n";
             }
             ++it;
+            // Message Successfully sent update last_active
+            // heartbeat_tracker[it->getSockID()] = std::chrono::steady_clock::now();
         }
     }
 }
@@ -95,13 +97,14 @@ void Server::checkStatusAndDiconnect()
 
     while(it != clients.end())
     {
+        bool it_invalid = false;
         auto sockId = it->getSockID();
         auto last_active = heartbeat_tracker[sockId];
         auto now = std::chrono::steady_clock::now();
 
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_active).count();
         std::cout<<"No Message from "<<sockId<<" since "<<elapsed<<"ms\n";
-        if(elapsed > 6000)  // This should come from a configuration file.
+        if(elapsed > 3000)  // This should come from a configuration file.
         {
             // Disconnect Client
             int error = ::close(socketId);
@@ -115,9 +118,13 @@ void Server::checkStatusAndDiconnect()
                 // Remove Client from monitor lists
                 std::cout<<"Client disconnected!!!!\n";
                 it = clients.erase(it);
-                heartbeat_tracker.erase(heartbeat_tracker.find(socketId));
+                it_invalid = true;
+                auto hbt_it = heartbeat_tracker.find(socketId);
+                if(hbt_it != heartbeat_tracker.end())
+                    heartbeat_tracker.erase(hbt_it);
             }
         }
-        ++it;
+        if(!it_invalid)
+            ++it;
     }
 }
