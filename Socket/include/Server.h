@@ -10,6 +10,8 @@ class Server: public Socket
         const int max_queued_requests = 5;
         std::vector<Socket> clients;
         std::map<int, std::chrono::steady_clock::time_point> heartbeat_tracker;
+        void addToHBTracker(int newSocket);
+        void removeFromHBTracker(int sockId);
     public:
         Server(std::string const & hostname, int const port);
         void accept();

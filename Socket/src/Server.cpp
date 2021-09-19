@@ -50,12 +50,9 @@ void Server::accept()
         {
             std::cerr << fprintf(stdout, "%s\n%s\n", "Failed to accept", strerror(errno));
         }    
-        std::cout<<"Adding new client\n";
+        std::cout<<"Adding new client on socket "<<newSocket<<"\n";
         clients.push_back(Socket(newSocket));
-
-        // Timestamp for every new client
-        auto pair = std::make_pair(newSocket, std::chrono::steady_clock::now());
-        heartbeat_tracker.insert(pair);
+        addToHBTracker(newSocket);
     }
 }
 
@@ -68,7 +65,8 @@ void Server::sendToAll(message m)
     {
         if(!(it->is_connected()))
         {
-            std::cout<<"Client disconnected!!!!\n";
+            std::cout<<"Client "<<it->getSockID()<<" disconnected!!!!\n";
+            removeFromHBTracker(it->getSockID());
             it = clients.erase(it);
         }
         else
@@ -79,9 +77,9 @@ void Server::sendToAll(message m)
             {
                 std::cout<<"failed\n";
             }
+            // Message Successfully sent, update last_active
+            heartbeat_tracker[it->getSockID()] = std::chrono::steady_clock::now();
             ++it;
-            // Message Successfully sent update last_active
-            // heartbeat_tracker[it->getSockID()] = std::chrono::steady_clock::now();
         }
     }
 }
@@ -94,37 +92,47 @@ std::vector<Socket>& Server::getClients()
 void Server::checkStatusAndDiconnect()
 {
     std::vector<Socket>::iterator it = clients.begin();
-
+    // std::cout<<"last active "<<heartbeat_tracker[it->getSockID()]<<'\n';
     while(it != clients.end())
     {
-        bool it_invalid = false;
-        auto sockId = it->getSockID();
-        auto last_active = heartbeat_tracker[sockId];
+        auto last_active = heartbeat_tracker[it->getSockID()];
         auto now = std::chrono::steady_clock::now();
 
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_active).count();
-        std::cout<<"No Message from "<<sockId<<" since "<<elapsed<<"ms\n";
+        std::cout<<"No Message from "<<it->getSockID()<<" since "<<elapsed<<"ms\n";
         if(elapsed > 3000)  // This should come from a configuration file.
         {
             // Disconnect Client
-            int error = ::close(socketId);
-            std::cout<<"closing coonection "<<sockId<<"\n";
-            if(error != 0)
-            {
-                std::cout<<"Error while disconneting client | error_no = "<<error<<'\n';
-            }
-            else
-            {
-                // Remove Client from monitor lists
-                std::cout<<"Client disconnected!!!!\n";
-                it = clients.erase(it);
-                it_invalid = true;
-                auto hbt_it = heartbeat_tracker.find(socketId);
-                if(hbt_it != heartbeat_tracker.end())
-                    heartbeat_tracker.erase(hbt_it);
-            }
+            int error = ::close(it->getSockID());
+            std::cout<<"closing coonection "<<it->getSockID()<<" "<<error<<"\n";
+            
+            // Remove Client from monitor lists
+            std::cout<<"Client "<<it->getSockID()<<" disconnected!!!!\n";
+            removeFromHBTracker(it->getSockID());
+            it = clients.erase(it);
         }
-        if(!it_invalid)
+        else
+        {
             ++it;
+        }
+    }
+}
+
+void Server::addToHBTracker(int newSocket)
+{
+    auto pair = std::make_pair(newSocket, std::chrono::steady_clock::now());
+    heartbeat_tracker.insert(pair);
+}
+void Server::removeFromHBTracker(int sockId)
+{
+    auto hbt_it = heartbeat_tracker.find(sockId);
+    if(hbt_it != heartbeat_tracker.end())
+    {
+        std::cout<<"Removed from hb tracker "<<sockId<<"\n";
+        heartbeat_tracker.erase(hbt_it);
+    }
+    else
+    {
+        std::cout<<"NOT Removed from hb tracker "<<sockId<<"\n";
     }
 }
