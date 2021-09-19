@@ -56,7 +56,7 @@ bool Client::RecvMessage(std::string & buffer)
             std::stringstream message("Failed: shutdown()\n");
             message << strerror(errno)<<"\n";
             std::cout<<message.str();
-            // abort();
+            exit(-1);
         }
     }
     // Message recived

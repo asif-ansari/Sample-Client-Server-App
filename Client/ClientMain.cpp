@@ -76,8 +76,7 @@ int main(int argc, char* argv[])
             message << strerror(errno)<<"\n";
             *running = false;
             std::cout<<message.str();
-            // abort();
-            continue;
+            exit(-1);
         }
         bool queued = sq->enqueue(buf);
         if(!queued)
