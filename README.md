@@ -17,13 +17,13 @@
  ┃   ┗ SafeQueue.cpp
  ┣ Socket
  ┃ ┣ include
- ┃ ┃ ┣ Client.h
- ┃ ┃ ┣ Server.h
- ┃ ┃ ┗ Socket.h
+ ┃ ┃ ┣ ClientSocket.h
+ ┃ ┃ ┣ ServerSocket.h
+ ┃ ┃ ┗ SocketBase.h
  ┃ ┗ src
- ┃   ┣ Client.cpp
- ┃   ┣ Server.cpp
- ┃   ┗ Socket.cpp
+ ┃   ┣ ClientSocket.cpp
+ ┃   ┣ ServerSocket.cpp
+ ┃   ┗ SocketBase.cpp
  ┗ Test
    ┣ FileGenerator.cpp
    ┗ FIleReader.cpp
