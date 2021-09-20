@@ -52,7 +52,7 @@ After a successful build all binaries are created within the `build` directory.
 1. Create sample input file
 ```
 cd (project_root)/build/Test
-./FileGenerator <number_of_ticker_to_generate>
+./FileGenerator <number_of_ticks_to_generate>
 ```
 2. Run the server - Server binary can be found in (project_root)/build/Server
 ```
