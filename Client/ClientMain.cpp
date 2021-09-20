@@ -1,4 +1,4 @@
-#include "../Socket/include/Client.h"
+#include "../Socket/include/ClientSocket.h"
 #include "../Server/include/locklessQ.hpp"
 
 #include <iostream>
