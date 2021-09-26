@@ -6,3 +6,5 @@ add_library(socket-static STATIC
     src/ServerSocket.cpp
     src/ClientSocket.cpp
 )
+
+target_include_directories(socket-static PUBLIC "include")
