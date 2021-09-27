@@ -1,5 +1,5 @@
-#include "../../Socket/include/ServerSocket.h"
-#include "../include/MessageReader.h"
+#include <ServerSocket.h>
+#include <MessageReader.h>
 #include <iostream>
 #include <chrono>
 #include <map>

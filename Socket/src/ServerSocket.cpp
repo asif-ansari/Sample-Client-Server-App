@@ -1,4 +1,4 @@
-#include "../include/ServerSocket.h"
+#include <ServerSocket.h>
 #include <string>
 #include <cstdint>
 #include <arpa/inet.h>
